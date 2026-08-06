@@ -15,12 +15,12 @@ from ..inverse_link_function_utils import (
     check_inverse_link_function,
     link_function_from_string,
 )
-from ..pytrees import FeaturePytree
 from ..regularizer import GroupLasso, Regularizer
 from ..type_casting import is_numpy_array_like
 from ..typing import DESIGN_INPUT_TYPE, UserProvidedParamsT
 from . import utils
-from .params import PPGLMParamsWithKey, X_ppglm, y_ppglm
+from .data import PredictorsPPGLM, SpikesPPGLM
+from .params import PPGLMParamsWithKey
 from .validation import (
     PopulationPPGLMValidator,
     PPGLMValidator,
@@ -291,7 +291,7 @@ class MockPPGLM(BaseRegressor):
     def _initialize_intercept_matching_mean_rate(
         self,
         inverse_link_function: Callable,
-        y: y_ppglm,
+        y: SpikesPPGLM,
     ) -> jnp.ndarray:
 
         analytical_inv = get_inverse_function(inverse_link_function)
@@ -314,8 +314,8 @@ class MockPPGLM(BaseRegressor):
 
     def _model_specific_initialization(
         self,
-        X: X_ppglm,
-        y: y_ppglm,
+        X: PredictorsPPGLM,
+        y: SpikesPPGLM,
         **kwargs,
     ) -> GLMParams:
 
@@ -376,7 +376,7 @@ class MockPPGLM(BaseRegressor):
         X: Any,
         y: Optional[Any] = None,
         *args,
-    ) -> Tuple[X_ppglm, y_ppglm]:
+    ) -> Tuple[PredictorsPPGLM, SpikesPPGLM]:
         """
         Preprocess spike timestamp inputs for fitting.
 
@@ -442,12 +442,12 @@ class MockPPGLM(BaseRegressor):
         spike_times = jnp.asarray(y.t)
         y_idx = jnp.searchsorted(event_times, spike_times)
 
-        X = X_ppglm(
+        X = PredictorsPPGLM(
             times=event_times,
             ids=jnp.asarray(X.d, dtype=int),
         )
 
-        y = y_ppglm(
+        y = SpikesPPGLM(
             times=spike_times,
             ids=jnp.asarray(y.d, dtype=int),
             idx=y_idx,
@@ -528,8 +528,8 @@ class MockPPGLM(BaseRegressor):
     def _compute_loss(
         self,
         params: PPGLMParamsWithKey,
-        X: X_ppglm,
-        y: y_ppglm,
+        X: PredictorsPPGLM,
+        y: SpikesPPGLM,
         *args,
         **kwargs,
     ) -> jnp.ndarray:
@@ -546,8 +546,8 @@ class MockPopulationPPGLM(MockPPGLM):
 
     def _model_specific_initialization(
         self,
-        X: X_ppglm,
-        y: y_ppglm,
+        X: PredictorsPPGLM,
+        y: SpikesPPGLM,
         **kwargs,
     ) -> GLMParams:
 
