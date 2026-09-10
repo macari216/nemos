@@ -157,6 +157,10 @@ VALID_PAIRS = [
     {"true_trans", "rec_trans"},
     {"n_classes", "n_passes"},
     {"true_intercept", "fit_intercept"},
+    # ppglm params
+    {"M_samples", "n_samples"},
+    {"bias", "bas"},
+    {"M_grid", "grid"},
 ]
 
 
